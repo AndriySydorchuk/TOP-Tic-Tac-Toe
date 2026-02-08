@@ -2,7 +2,6 @@ const Game = (function () {
     let player;
     let computer;
     const init = function () {
-        console.log('Game init call');
         player = createPlayer('Furman', 'X', randomMove);
         computer = createPlayer('Computer', 'O', randomMove);
     };
@@ -90,6 +89,7 @@ const Gameboard = (function () {
         for (const line of board) {
             console.log(`${line}\n`);
         }
+        console.log('--------------------------------------');
     };
     const isEmptyCell = function (row, col) {
         if (board[row][col] === '-') {
