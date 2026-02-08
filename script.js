@@ -6,7 +6,10 @@ const Game = (function () {
         computer = createPlayer('Computer', 'O', randomMove);
     };
     const play = function () {
-        let win = false;
+        let result = {
+            win: false,
+            winner: ''
+        }
 
         do {
             Gameboard.display();
@@ -14,19 +17,22 @@ const Game = (function () {
             player.move();
             Gameboard.display();
 
-            win = checkWin();
+            result = checkWin();
 
-            if (!win) {
+            if (!result.win) {
                 computer.move();
                 Gameboard.display();
             }
 
-            win = checkWin();
+            result = checkWin();
 
-        } while (!win);
+        } while (!result.win);
+
+        displayWinner(result);
     };
     const checkWin = function () {
         let win = false;
+        let winner = '';
 
         for (let i = 0; i < Gameboard.winCombinations.length; i++) {
             //get combination
@@ -50,17 +56,32 @@ const Game = (function () {
             const val3 = Gameboard.getCell(cell3[0], cell3[1]);
 
             if (val1 === val2 && val2 === val3 && val1 !== '-') {
-                return true;
+                win = true;
+                winner = val1;
             }
-
         }
 
-        if (win) return true;
+        if (win) {
+            return { win, winner };
+        };
 
         //tie
-        if (Gameboard.isFull()) return true;
+        if (Gameboard.isFull()) {
+            return { win: true, winner: 'tie' };
+        };
 
-        return false;
+        return { win: false, winner };
+    };
+    const displayWinner = function (result) {
+        if (result.win) {
+            if (result.winner === 'tie') {
+                console.log('Tie!');
+            } else if (result.winner === player.getSign()) {
+                console.log(`${player.getName()} wins!`);
+            } else {
+                console.log(`${computer.getName()} wins!`);
+            }
+        }
     }
 
     return { init, play };
