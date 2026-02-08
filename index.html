@@ -15,6 +15,23 @@
     </header>
     <main class="main">
         <div class="container">
+            <div class="setup">
+                <p class="form-title">Create your player</p>
+                <form class="form">
+                    <label for="playerName">Name</label>
+                    <input id="nameInput" type="text">
+                    <br>
+
+                    <label for="sign">Sign</label>
+                    <select name="signInput" id="signInput">
+                        <option value="x">X</option>
+                        <option value="o">O</option>
+                    </select>
+                    <br>
+
+                    <button type="submit">Start Game</button>
+                </form>
+            </div>
             <div class="board">
                 <div class="cell"></div>
                 <div class="cell"></div>
