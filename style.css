@@ -15,6 +15,10 @@ body {
     align-items: center;
 }
 
+.header {
+    font-size: 96px;
+}
+
 .board {
     display: grid;
     grid-template-rows: repeat(3, 200px);
@@ -31,4 +35,9 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 48px;
+}
+
+.footer {
+    color: lightgray;
+    margin-bottom: 10px;
 }
