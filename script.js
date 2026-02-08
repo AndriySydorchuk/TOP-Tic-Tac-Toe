@@ -13,4 +13,25 @@ const Gameboard = (function () {
     return { display }
 })();
 
-Gameboard.display();
+function createPlayer(name, sign) {
+    return {
+        getName() {
+            return name;
+        },
+        setName(newName) {
+            name = newName;
+        },
+        getSign() {
+            return sign;
+        },
+        setSign(newSign) {
+            sign = newSign;
+        },
+        move(func) {
+            func();
+        }
+    }
+}
+
+const player = createPlayer('Furman', 'X');
+const computer = createPlayer('Computer', 'O');
