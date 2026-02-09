@@ -1,5 +1,6 @@
 :root {
     --background-primary: rgb(33, 33, 33);
+    --background-primary-hover: rgb(84, 84, 84);
     --background-secondary: rgb(66, 66, 66);
     --font-primary: white;
     --font-secondary: lightgray;
@@ -66,7 +67,7 @@ body {
 }
 
 .form-btn:hover {
-    background-color: rgb(84, 84, 84);
+    background-color: var(--background-primary-hover);
 }
 
 .board {
@@ -86,6 +87,11 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 36px;
+    cursor: pointer;
+}
+
+.cell:hover {
+    background-color: var(--background-primary-hover);
 }
 
 .footer {
