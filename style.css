@@ -71,8 +71,8 @@ body {
 
 .board {
     display: grid;
-    grid-template-rows: repeat(3, 200px);
-    grid-template-columns: repeat(3, 200px);
+    grid-template-rows: repeat(3, 150px);
+    grid-template-columns: repeat(3, 150px);
     display: none;
 }
 
@@ -85,7 +85,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 48px;
+    font-size: 36px;
 }
 
 .footer {
