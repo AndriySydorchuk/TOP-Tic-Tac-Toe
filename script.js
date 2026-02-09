@@ -167,7 +167,7 @@ function randomMove(sign) {
 }
 
 const DOMHandler = (function () {
-    const setupFormHandler = function (onSuccess) {
+    const setupForm = function (onSuccess) {
         const form = document.querySelector('.form');
         if (!form) return;
 
@@ -183,6 +183,17 @@ const DOMHandler = (function () {
                 onSuccess(formData);
             }
         })
+    };
+
+    const setupCells = function (onSuccess) {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (typeof onSuccess === 'function') {
+                    return onSuccess(cell);
+                }
+            });
+        });
     };
 
     const toggleGameboard = function () {
@@ -203,8 +214,8 @@ const DOMHandler = (function () {
         }
     };
 
-    return { setupFormHandler };
+    return { setupForm, setupCells };
 })();
 
-Game.initPlayer({ name: 'Furman', sign: 'X' });
-Game.play();
+DOMHandler.setupForm();
+DOMHandler.setupCells()
