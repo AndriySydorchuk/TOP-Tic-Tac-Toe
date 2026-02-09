@@ -165,5 +165,46 @@ function randomMove(sign) {
     Gameboard.setCell(row, col, sign);
 }
 
-Game.init();
-Game.play();
+const domHandler = (function () {
+    let formData = {};
+
+    const initFormData = function () {
+        const form = document.querySelector('.form');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const fData = new FormData(form);
+            formData = Object.fromEntries(fData.entries());
+
+            toggleGameboard();
+
+            console.log(formData);
+        })
+    };
+    const getFormData = function () {
+        return formData;
+    };
+    const toggleGameboard = function () {
+        const formTitle = document.querySelector('.form-title');
+        const form = document.querySelector('.form');
+        const board = document.querySelector('.board');
+
+        const isCreatePlayer = board.style.display === '';
+
+        if (isCreatePlayer) {
+            formTitle.style.display = 'none';
+            form.style.display = 'none';
+            board.style.display = 'grid';
+        } else {
+            formTitle.style.display = 'block';
+            form.style.display = 'block';
+            board.style.display = 'none';
+        }
+    }
+
+    return { initFormData };
+})();
+
+
+domHandler.initFormData();
