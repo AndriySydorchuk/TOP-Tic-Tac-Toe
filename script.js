@@ -1,8 +1,8 @@
 const Game = (function () {
     let player;
     let computer;
-    const init = function () {
-        player = createPlayer('Furman', 'X', randomMove);
+    const initPlayer = function (newPlayer) {
+        player = createPlayer(newPlayer.name, newPlayer.sign, randomMove);
         computer = createPlayer('Computer', 'O', randomMove);
     };
     const play = function () {
@@ -39,23 +39,23 @@ const Game = (function () {
             const winCondition = Gameboard.winCombinations[i];
 
             //get cells
-            const [cell1, cell2, cell3] = winCondition;
+            const [cell1Idx, cell2Idx, cell3Idx] = winCondition;
 
             //check if all these cells are not empty
             if (
-                Gameboard.isEmptyCell(cell1[0], cell1[1]) ||
-                Gameboard.isEmptyCell(cell2[0], cell2[1]) ||
-                Gameboard.isEmptyCell(cell3[0], cell3[1])
+                Gameboard.isEmptyCell(cell1Idx) ||
+                Gameboard.isEmptyCell(cell2Idx) ||
+                Gameboard.isEmptyCell(cell3Idx)
             ) {
                 continue;
             }
 
             //check if they're the same
-            const val1 = Gameboard.getCell(cell1[0], cell1[1]);
-            const val2 = Gameboard.getCell(cell2[0], cell2[1]);
-            const val3 = Gameboard.getCell(cell3[0], cell3[1]);
+            const val1 = Gameboard.getCell(cell1Idx);
+            const val2 = Gameboard.getCell(cell2Idx);
+            const val3 = Gameboard.getCell(cell3Idx);
 
-            if (val1 === val2 && val2 === val3 && val1 !== '-') {
+            if (val1 === val2 && val2 === val3 && val1 !== '') {
                 win = true;
                 winner = val1;
             }
@@ -84,48 +84,51 @@ const Game = (function () {
         }
     }
 
-    return { init, play };
+    return { initPlayer, play };
 })();
 
 const Gameboard = (function () {
     const board = [
-        ['-', '-', '-'],
-        ['-', '-', '-'],
-        ['-', '-', '-']
+        '', '', '',
+        '', '', '',
+        '', '', ''
     ];
     const winCombinations = [
-        [[0, 0], [0, 1], [0, 2]],
-        [[1, 0], [1, 1], [1, 2]],
-        [[2, 0], [2, 1], [2, 2]],
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
 
-        [[0, 0], [1, 0], [2, 0]],
-        [[0, 1], [1, 1], [2, 1]],
-        [[0, 2], [1, 2], [2, 2]],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
 
-        [[0, 0], [1, 1], [2, 2]],
-        [[0, 2], [1, 1], [2, 0]],
+        [0, 4, 8],
+        [2, 4, 6],
     ];
 
     const display = function () {
-        for (const line of board) {
-            console.log(`${line}\n`);
-        }
+        const line1 = `${board[0]} ${board[1]} ${board[2]}`;
+        const line2 = `${board[3]} ${board[4]} ${board[5]}`;
+        const line3 = `${board[6]} ${board[7]} ${board[8]}`;
+        console.log(line1);
+        console.log(line2);
+        console.log(line3);
         console.log('--------------------------------------');
     };
-    const isEmptyCell = function (row, col) {
-        if (board[row][col] === '-') {
+    const isEmptyCell = function (index) {
+        if (board[index] === '') {
             return true;
         }
         return false;
     };
-    const setCell = function (row, col, sign) {
-        board[row][col] = sign;
+    const setCell = function (index, sign) {
+        board[index] = sign;
     };
-    const getCell = function (row, col) {
-        return board[row][col];
+    const getCell = function (index) {
+        return board[index];
     };
     const isFull = function () {
-        return board.flat().every(cell => cell !== '-');
+        return board.flat().every(cell => cell !== '');
     };
 
     return { display, isEmptyCell, setCell, getCell, winCombinations, isFull }
@@ -152,39 +155,36 @@ function createPlayer(name, sign, moveFunc) {
 }
 
 function randomMove(sign) {
-    const maxLineLength = 3; // 0..2
-    let row;
-    let col;
+    const maxLineLength = 9; // 0..8
+    let index = -1;
 
     do {
-        row = Math.floor(Math.random() * maxLineLength);
-        col = Math.floor(Math.random() * maxLineLength);
+        index = Math.floor(Math.random() * maxLineLength);
 
-    } while (!Gameboard.isEmptyCell(row, col));
+    } while (!Gameboard.isEmptyCell(index));
 
-    Gameboard.setCell(row, col, sign);
+    Gameboard.setCell(index, sign);
 }
 
-const domHandler = (function () {
-    let formData = {};
-
-    const initFormData = function () {
+const DOMHandler = (function () {
+    const setupFormHandler = function (onSuccess) {
         const form = document.querySelector('.form');
+        if (!form) return;
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
 
             const fData = new FormData(form);
-            formData = Object.fromEntries(fData.entries());
+            const formData = Object.fromEntries(fData.entries());
 
             toggleGameboard();
 
-            console.log(formData);
+            if (typeof onSuccess === 'function') {
+                onSuccess(formData);
+            }
         })
     };
-    const getFormData = function () {
-        return formData;
-    };
+
     const toggleGameboard = function () {
         const formTitle = document.querySelector('.form-title');
         const form = document.querySelector('.form');
@@ -201,10 +201,10 @@ const domHandler = (function () {
             form.style.display = 'block';
             board.style.display = 'none';
         }
-    }
+    };
 
-    return { initFormData };
+    return { setupFormHandler };
 })();
 
-
-domHandler.initFormData();
+Game.initPlayer({ name: 'Furman', sign: 'X' });
+Game.play();
