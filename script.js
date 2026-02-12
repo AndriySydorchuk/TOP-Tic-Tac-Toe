@@ -31,31 +31,24 @@ const Game = (function () {
             initPlayer(formData);
         }));
 
-        let isPlayerMove = true;//rework according to X : O order of moving
-
-        DOMHandler.setupCells((cell) => {
-            player.move(player.getSign(), cell.id);
+        DOMHandler.setupCells((selectedCell) => {
+            player.move(player.getSign(), selectedCell.id);
             isPlayerMove = false;
+            DOMHandler.updateBoard();
 
             result = checkWin();
 
-            DOMHandler.updateBoard();
+            if (!result.win) {
+                computer.move(computer.getSign());
+                isPlayerMove = true;
+                DOMHandler.updateBoard();
+
+                result = checkWin();
+            }
+
+            displayWinner(result);
         })
 
-        if (!result.win && !isPlayerMove) {
-            computer.move(computer.getSign());
-
-            isPlayerMove = true;
-
-            result = checkWin();
-            //logs
-            console.log('computer moved');
-            console.log(result);
-
-            DOMHandler.updateBoard();
-        }
-
-        displayWinner(result);
     };
 
     const checkWin = function () {
@@ -190,18 +183,12 @@ function createPlayer(name, sign, moveFunc) {
 
 function computerMove(sign, index = -1) {
     const maxLineLength = 9; // 0..8
-    console.log(`computer move: initial index = ${index}`);
 
     do {
         index = Math.floor(Math.random() * maxLineLength);
-        console.log(`computer move: generated index = ${index}`);
-
-
     } while (!Gameboard.isEmptyCell(index));
 
     Gameboard.setCell(index, sign);
-    console.log(`computer move: final index = ${index}`);
-
 }
 
 function playerMove(sign, index) {
