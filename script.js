@@ -1,35 +1,63 @@
 const Game = (function () {
     let player;
     let computer;
+
     const initPlayer = function (newPlayer) {
-        player = createPlayer(newPlayer.name, newPlayer.sign, randomMove);
-        computer = createPlayer('Computer', 'O', randomMove);
+        player = createPlayer(newPlayer.name, newPlayer.sign.toUpperCase(), playerMove);
+
+        const computerSign = player.getSign() === 'X' ? 'O' : 'X';
+        computer = createPlayer('Computer', computerSign, computerMove);
     };
+
+    const getPlayer = function () {
+        if (player) {
+            return player;
+        }
+    }
+
+    const getComputer = function () {
+        if (computer) {
+            return computer;
+        }
+    }
+
     const play = function () {
         let result = {
             win: false,
             winner: ''
         }
 
-        do {
-            Gameboard.display();
+        DOMHandler.setupForm((formData => {
+            initPlayer(formData);
+        }));
 
-            player.move();
-            Gameboard.display();
+        let isPlayerMove = true;//rework according to X : O order of moving
 
-            result = checkWin();
-
-            if (!result.win) {
-                computer.move();
-                Gameboard.display();
-            }
+        DOMHandler.setupCells((cell) => {
+            player.move(player.getSign(), cell.id);
+            isPlayerMove = false;
 
             result = checkWin();
 
-        } while (!result.win);
+            DOMHandler.updateBoard();
+        })
+
+        if (!result.win && !isPlayerMove) {
+            computer.move(computer.getSign());
+
+            isPlayerMove = true;
+
+            result = checkWin();
+            //logs
+            console.log('computer moved');
+            console.log(result);
+
+            DOMHandler.updateBoard();
+        }
 
         displayWinner(result);
     };
+
     const checkWin = function () {
         let win = false;
         let winner = '';
@@ -72,6 +100,7 @@ const Game = (function () {
 
         return { win: false, winner };
     };
+
     const displayWinner = function (result) {
         if (result.win) {
             if (result.winner === 'tie') {
@@ -81,10 +110,11 @@ const Game = (function () {
             } else {
                 console.log(`${computer.getName()} wins!`);
             }
+            DOMHandler.toggleCellsActiveness();
         }
     }
 
-    return { initPlayer, play };
+    return { initPlayer, getPlayer, getComputer, play };
 })();
 
 const Gameboard = (function () {
@@ -131,7 +161,11 @@ const Gameboard = (function () {
         return board.flat().every(cell => cell !== '');
     };
 
-    return { display, isEmptyCell, setCell, getCell, winCombinations, isFull }
+    const getBoard = function () {
+        return board;
+    }
+
+    return { display, isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard }
 })();
 
 function createPlayer(name, sign, moveFunc) {
@@ -148,22 +182,32 @@ function createPlayer(name, sign, moveFunc) {
         setSign(newSign) {
             sign = newSign;
         },
-        move() {
-            moveFunc(sign);
+        move(sign, index) {
+            moveFunc(sign, index);
         }
     }
 }
 
-function randomMove(sign) {
+function computerMove(sign, index = -1) {
     const maxLineLength = 9; // 0..8
-    let index = -1;
+    console.log(`computer move: initial index = ${index}`);
 
     do {
         index = Math.floor(Math.random() * maxLineLength);
+        console.log(`computer move: generated index = ${index}`);
+
 
     } while (!Gameboard.isEmptyCell(index));
 
     Gameboard.setCell(index, sign);
+    console.log(`computer move: final index = ${index}`);
+
+}
+
+function playerMove(sign, index) {
+    if (Gameboard.isEmptyCell(index)) {
+        Gameboard.setCell(index, sign);
+    }
 }
 
 const DOMHandler = (function () {
@@ -196,6 +240,14 @@ const DOMHandler = (function () {
         });
     };
 
+    const updateBoard = function () {
+        const cells = document.querySelectorAll('.cell');
+        const board = Gameboard.getBoard();
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].innerText = board[i];
+        }
+    }
+
     const toggleGameboard = function () {
         const formTitle = document.querySelector('.form-title');
         const form = document.querySelector('.form');
@@ -214,8 +266,12 @@ const DOMHandler = (function () {
         }
     };
 
-    return { setupForm, setupCells };
+    const toggleCellsActiveness = function () {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => cell.disabled = true);
+    }
+
+    return { setupForm, setupCells, updateBoard, toggleGameboard, toggleCellsActiveness };
 })();
 
-DOMHandler.setupForm();
-DOMHandler.setupCells()
+Game.play();
