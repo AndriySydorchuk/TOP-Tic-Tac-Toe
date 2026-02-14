@@ -46,7 +46,8 @@ const Game = (function () {
                 result = checkWin();
             }
 
-            displayWinner(result);
+
+            DOMHandler.displayWinner(result);
         })
 
     };
@@ -93,19 +94,6 @@ const Game = (function () {
 
         return { win: false, winner };
     };
-
-    const displayWinner = function (result) {
-        if (result.win) {
-            if (result.winner === 'tie') {
-                console.log('Tie!');
-            } else if (result.winner === player.getSign()) {
-                console.log(`${player.getName()} wins!`);
-            } else {
-                console.log(`${computer.getName()} wins!`);
-            }
-            DOMHandler.toggleCellsActiveness();
-        }
-    }
 
     return { initPlayer, getPlayer, getComputer, play };
 })();
@@ -279,7 +267,30 @@ const DOMHandler = (function () {
         }
     };
 
-    return { setupForm, setupCells, updateBoard, toggleGameboard, toggleCellsActiveness };
+    const displayWinner = function (result) {
+        if (result.win) {
+            const container = document.querySelector('.container');
+
+            const winnerText = document.createElement('p');
+
+            if (result.winner === 'tie') {
+                winnerText.textContent = 'Tie!';
+            } else {
+                const winnerPlayer = result.winner === Game.getPlayer().getSign() ? Game.getPlayer() : Game.getComputer();
+                winnerText.textContent = `${winnerPlayer.getName()} wins!`;
+            }
+
+            winnerText.style.marginTop = '15px';
+            winnerText.style.textAlign = 'center';
+            winnerText.style.fontSize = '24px';
+
+            container.appendChild(winnerText);
+
+            toggleCellsActiveness();
+        }
+    }
+
+    return { setupForm, setupCells, updateBoard, toggleGameboard, displayWinner };
 })();
 
 Game.play();
