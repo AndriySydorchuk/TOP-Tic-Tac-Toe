@@ -103,7 +103,7 @@ const Game = (function () {
 })();
 
 const Gameboard = (function () {
-    const board = [
+    let board = [
         '', '', '',
         '', '', '',
         '', '', ''
@@ -150,7 +150,11 @@ const Gameboard = (function () {
         return board;
     }
 
-    return { display, isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard }
+    const clear = function () {
+        board = board.map(cell => cell = '');
+    }
+
+    return { display, isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard, clear }
 })();
 
 function createPlayer(name, sign, moveFunc) {
@@ -195,10 +199,12 @@ const DOMHandler = (function () {
         if (!form) return;
 
         form.addEventListener('submit', (event) => {
+            console.log('submit')
             event.preventDefault();
 
             const fData = new FormData(form);
             const formData = Object.fromEntries(fData.entries());
+            console.log(formData);
 
             toggleGameboard();
 
@@ -232,15 +238,21 @@ const DOMHandler = (function () {
 
         if (isCellsActive) { //deactivate
             cells.forEach(cell => {
-                cell.style.cursor = 'default';
-                cell.style.backgroundColor = 'rgb(84, 84, 84)';
+                cell.classList.remove('cell-active')
+                cell.classList.add('cell-disabled')
                 cell.removeEventListener('click', handleCellClick);
             });
         } else { //activate
             cells.forEach(cell => {
-                cell.style.cursor = 'pointer';
-                cell.style.backgroundColor = 'rgb(33, 33, 33)';
+                cell.classList.remove('cell-disabled');
+                cell.classList.add('cell-active');
                 cell.addEventListener('click', handleCellClick);
+                cell.addEventListener('mouseover', () => {
+                    cell.classList.add('hovered');
+                })
+                cell.addEventListener('mouseout', () => {
+                    cell.classList.remove('hovered');
+                })
             });
         }
     }
@@ -261,13 +273,13 @@ const DOMHandler = (function () {
         const isCreatePlayer = board.style.display === '';
 
         if (isCreatePlayer) {
-            formTitle.style.display = 'none';
-            form.style.display = 'none';
+            formTitle.classList.add('form-hidden');
+            form.classList.add('form-hidden');
             board.style.display = 'grid';
         } else {
-            formTitle.style.display = 'block';
-            form.style.display = 'block';
-            board.style.display = 'none';
+            formTitle.classList.remove('form-hidden');
+            form.classList.remove('form-hidden');
+            board.style.display = '';
         }
     };
 
@@ -304,15 +316,41 @@ const DOMHandler = (function () {
         const restartBtn = document.createElement('button');
         restartBtn.textContent = 'Restart';
         restartBtn.classList.add('restart-btn');
+        restartBtn.addEventListener('click', () => {
+            clearRestartSection();
+
+            Gameboard.clear()
+            updateBoard()
+
+            toggleCellsActiveness()
+        })
 
         const playerMenuBtn = document.createElement('button');
         playerMenuBtn.textContent = 'Player Menu';
         playerMenuBtn.classList.add('playermenu-btn');
+        playerMenuBtn.addEventListener('click', () => {
+            clearRestartSection()
+
+            document.querySelector('#name-input').value = '' //clear input
+
+            Gameboard.clear()
+            updateBoard()
+            toggleGameboard();
+
+            toggleCellsActiveness()
+        })
 
         restartBtnsContainer.appendChild(restartBtn);
         restartBtnsContainer.appendChild(playerMenuBtn);
 
         container.appendChild(restartBtnsContainer);
+    }
+
+    const clearRestartSection = function () {
+        const winnerText = document.querySelector('.winner-text');
+        const restartBtnsContainer = document.querySelector('.restart-btn-container');
+        winnerText.remove();
+        restartBtnsContainer.remove();
     }
 
     return { setupForm, setupCells, updateBoard, toggleGameboard, displayWinner };
