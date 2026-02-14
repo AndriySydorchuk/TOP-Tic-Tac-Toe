@@ -57,6 +57,10 @@ body {
     width: 50%;
 }
 
+.form-hidden {
+    display: none;
+}
+
 .restart-btn,
 .form-btn,
 .playermenu-btn {
@@ -94,10 +98,20 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 36px;
-    cursor: pointer;
 }
 
-.cell:hover {
+.cell-active {
+    cursor: pointer;
+    background-color: var(--background-primary)
+}
+
+.cell-disabled {
+    cursor: default;
+    background-color: var(--background-primary-hover)
+}
+
+.cell:hover,
+.hovered {
     background-color: var(--background-primary-hover);
 }
 
