@@ -276,19 +276,36 @@ const DOMHandler = (function () {
             const container = document.querySelector('.container');
 
             const winnerText = document.createElement('p');
-
             if (result.winner === 'tie') {
                 winnerText.textContent = 'Tie!';
             } else {
                 const winnerPlayer = result.winner === Game.getPlayer().getSign() ? Game.getPlayer() : Game.getComputer();
                 winnerText.textContent = `${winnerPlayer.getName()} wins!`;
             }
-
             winnerText.style.marginTop = '15px';
             winnerText.style.textAlign = 'center';
             winnerText.style.fontSize = '24px';
 
+
+            const restartBtnsContainer = document.createElement('div');
+            restartBtnsContainer.style.display = 'flex'
+            restartBtnsContainer.style.justifyContent = 'space-around';
+
+            const restartBtn = document.createElement('button');
+            restartBtn.textContent = 'Restart';
+            restartBtn.classList.add('restart-btn');
+
+            const playerMenuBtn = document.createElement('button');
+            playerMenuBtn.textContent = 'Player Menu';
+            playerMenuBtn.classList.add('playermenu-btn');
+
+            restartBtnsContainer.appendChild(restartBtn);
+            restartBtnsContainer.appendChild(playerMenuBtn);
+
+
             container.appendChild(winnerText);
+            container.appendChild(restartBtnsContainer);
+
 
             toggleCellsActiveness();
         }
