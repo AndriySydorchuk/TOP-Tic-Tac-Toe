@@ -216,16 +216,42 @@ const DOMHandler = (function () {
         })
     };
 
+    let handleCellClick;
+
     const setupCells = function (onSuccess) {
         const cells = document.querySelectorAll('.cell');
+
+        handleCellClick = function (event) {
+            if (typeof onSuccess === 'function') {
+                return onSuccess(event.currentTarget);
+            }
+        }
+
         cells.forEach(cell => {
-            cell.addEventListener('click', () => {
-                if (typeof onSuccess === 'function') {
-                    return onSuccess(cell);
-                }
-            });
+            cell.addEventListener('click', handleCellClick);
         });
     };
+
+    const toggleCellsActiveness = function () {
+        const cells = document.querySelectorAll('.cell');
+
+        //if at least one cell is filled that means that all the board is active
+        const isCellsActive = [...cells].find(cell => cell.innerText !== '');
+
+        if (isCellsActive) { //deactivate
+            cells.forEach(cell => {
+                cell.style.cursor = 'default';
+                cell.style.backgroundColor = 'rgb(84, 84, 84)';
+                cell.removeEventListener('click', handleCellClick);
+            });
+        } else { //activate
+            cells.forEach(cell => {
+                cell.style.cursor = 'pointer';
+                cell.style.backgroundColor = 'rgb(33, 33, 33)';
+                cell.addEventListener('click', handleCellClick);
+            });
+        }
+    }
 
     const updateBoard = function () {
         const cells = document.querySelectorAll('.cell');
@@ -252,11 +278,6 @@ const DOMHandler = (function () {
             board.style.display = 'none';
         }
     };
-
-    const toggleCellsActiveness = function () {
-        const cells = document.querySelectorAll('.cell');
-        cells.forEach(cell => cell.disabled = true);
-    }
 
     return { setupForm, setupCells, updateBoard, toggleGameboard, toggleCellsActiveness };
 })();
