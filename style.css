@@ -101,6 +101,17 @@ body {
     background-color: var(--background-primary-hover);
 }
 
+.winner-text {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.restart-btn-container {
+    display: flex;
+    justify-content: space-around;
+}
+
 .footer {
     color: var(--font-secondary);
     margin-bottom: 10px;
