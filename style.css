@@ -57,16 +57,23 @@ body {
     width: 50%;
 }
 
-.form-btn {
+.restart-btn,
+.form-btn,
+.playermenu-btn {
     background-color: var(--background-secondary);
     padding: 16px 32px;
     font-size: 24px;
     margin-top: 16px;
-    margin-left: 90px;
     cursor: pointer;
 }
 
-.form-btn:hover {
+.form-btn {
+    margin-left: 90px;
+}
+
+.restart-btn:hover,
+.form-btn:hover,
+.playermenu-btn:hover {
     background-color: var(--background-primary-hover);
 }
 
