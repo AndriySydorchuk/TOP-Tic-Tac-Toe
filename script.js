@@ -32,9 +32,14 @@ const Game = (function () {
         }));
 
         DOMHandler.setupCells((selectedCell) => {
+            let initialCellText = selectedCell.innerText;
+
             player.move(player.getSign(), selectedCell.id);
-            isPlayerMove = false;
+            if (initialCellText === Gameboard.getCell(selectedCell.id)) return;
+
             DOMHandler.updateBoard();
+
+            isPlayerMove = false;
 
             result = checkWin();
 
@@ -45,7 +50,6 @@ const Game = (function () {
 
                 result = checkWin();
             }
-
 
             DOMHandler.displayWinner(result);
         })
