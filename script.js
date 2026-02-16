@@ -27,31 +27,48 @@ const Game = (function () {
             winner: ''
         }
 
-        DOMHandler.setupForm((formData => {
+        let isPlayerTurn;
+
+        DOMHandler.setupForm((formData) => {
             initPlayer(formData);
-        }));
+            isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
+            if (!isPlayerTurn) {
+                computer.move(computer.getSign());
+                DOMHandler.updateBoard();
+                isPlayerTurn = true;
+            }
+        })
 
         DOMHandler.setupCells((selectedCell) => {
             let initialCellText = selectedCell.innerText;
 
-            player.move(player.getSign(), selectedCell.id);
-            if (initialCellText === Gameboard.getCell(selectedCell.id)) return;
+            if (isPlayerTurn) {
+                //Player turn
+                player.move(player.getSign(), selectedCell.id);
+                if (initialCellText === Gameboard.getCell(selectedCell.id)) return;
 
-            DOMHandler.updateBoard();
-
-            isPlayerMove = false;
-
-            result = checkWin();
-
-            if (!result.win) {
-                computer.move(computer.getSign());
-                isPlayerMove = true;
                 DOMHandler.updateBoard();
 
                 result = checkWin();
+
+                //Computer turn
+                if (!result.win) {
+                    computer.move(computer.getSign());
+                    DOMHandler.updateBoard();
+                    result = checkWin();
+                }
             }
 
             DOMHandler.displayWinner(result);
+        });
+
+        DOMHandler.setupRestartBtn(() => {
+            isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
+            if (!isPlayerTurn) {
+                computer.move(computer.getSign());
+                DOMHandler.updateBoard();
+                isPlayerTurn = true;
+            }
         })
 
     };
@@ -313,17 +330,8 @@ const DOMHandler = (function () {
         const restartBtnsContainer = document.createElement('div');
         restartBtnsContainer.classList.add('restart-btn-container')
 
-        const restartBtn = document.createElement('button');
-        restartBtn.textContent = 'Restart';
-        restartBtn.classList.add('restart-btn');
-        restartBtn.addEventListener('click', () => {
-            clearRestartSection();
-
-            Gameboard.clear()
-            updateBoard()
-
-            toggleCellsActiveness()
-        })
+        const restartBtn = document.querySelector('.restart-btn');
+        if (restartBtn.classList.contains('hidden')) restartBtn.classList.remove('hidden');
 
         const playerMenuBtn = document.createElement('button');
         playerMenuBtn.textContent = 'Player Menu';
@@ -346,14 +354,41 @@ const DOMHandler = (function () {
         container.appendChild(restartBtnsContainer);
     }
 
+    const setupRestartBtn = function (onSuccess) {
+        const restartBtn = document.querySelector('.restart-btn');
+        if (!restartBtn) return;
+
+        restartBtn.addEventListener('click', () => {
+            clearRestartSection();
+
+            Gameboard.clear()
+            updateBoard()
+
+            toggleCellsActiveness()
+
+            if (typeof onSuccess === 'function') {
+
+                //if not player turn
+                //computer turn
+                return onSuccess();
+            }
+        })
+    };
+
     const clearRestartSection = function () {
         const winnerText = document.querySelector('.winner-text');
+        const restartBtn = document.querySelector('.restart-btn');
+        restartBtn.classList.add('hidden');
+        document.body.appendChild(restartBtn);
+
         const restartBtnsContainer = document.querySelector('.restart-btn-container');
         winnerText.remove();
         restartBtnsContainer.remove();
     }
 
-    return { setupForm, setupCells, updateBoard, toggleGameboard, displayWinner };
+    return { setupForm, setupCells, updateBoard, toggleGameboard, displayWinner, setupRestartBtn };
 })();
 
 Game.play();
+
+//TODO handle scenario when player selects O as a sign
