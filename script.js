@@ -5,8 +5,19 @@ const Game = (function () {
 
 
     const initPlayers = function (userPlayer) {
-        player = createPlayer(userPlayer.name, userPlayer.sign.toUpperCase(), playerMove);
-        computer = createPlayer('Computer', player.getSign() === 'X' ? 'O' : 'X', computerMove);
+        player = createPlayer(userPlayer.name, userPlayer.sign.toUpperCase(), (function (index) {
+            Gameboard.setCell(index, this.getSign());
+        }))
+
+        computer = createPlayer('Computer', player.getSign() === 'X' ? 'O' : 'X', (function (index = -1) {
+            const maxIndex = Gameboard.getBoard().length;
+
+            do {
+                index = Math.floor(Math.random() * maxIndex);
+            } while (!Gameboard.isEmptyCell(index));
+
+            Gameboard.setCell(index, this.getSign());
+        }));
     };
 
     const getPlayer = function () {
@@ -29,7 +40,7 @@ const Game = (function () {
 
             isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
             if (!isPlayerTurn) {
-                computer.move(computer.getSign());
+                computer.move();
                 DOMHandler.updateBoard();
                 isPlayerTurn = true;
             }
@@ -39,7 +50,7 @@ const Game = (function () {
             let initialCellText = selectedCell.innerText;
 
             if (isPlayerTurn) {
-                player.move(player.getSign(), selectedCell.id);//todo
+                player.move(selectedCell.id);
                 const moveNotSetted = initialCellText === Gameboard.getCell(selectedCell.id);
                 if (moveNotSetted) return;
 
@@ -49,7 +60,7 @@ const Game = (function () {
 
                 //Computer turn
                 if (!winner) {
-                    computer.move(computer.getSign());
+                    computer.move();
                     DOMHandler.updateBoard();
                     winner = checkWin();
                 }
@@ -61,7 +72,7 @@ const Game = (function () {
         DOMHandler.setupRestartBtn(() => {
             isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
             if (!isPlayerTurn) {
-                computer.move(computer.getSign());
+                computer.move();
                 DOMHandler.updateBoard();
                 isPlayerTurn = true;
             }
@@ -179,25 +190,9 @@ function createPlayer(name, sign, moveFunc) {
         setSign(newSign) {
             sign = newSign;
         },
-        move(sign, index) {
-            moveFunc(sign, index);
+        move(index) {
+            moveFunc.call(this, index);
         }
-    }
-}
-
-function computerMove(sign, index = -1) {
-    const maxLineLength = 9; // 0..8
-
-    do {
-        index = Math.floor(Math.random() * maxLineLength);
-    } while (!Gameboard.isEmptyCell(index));
-
-    Gameboard.setCell(index, sign);
-}
-
-function playerMove(sign, index) {
-    if (Gameboard.isEmptyCell(index)) {
-        Gameboard.setCell(index, sign);
     }
 }
 
@@ -207,12 +202,10 @@ const DOMHandler = (function () {
         if (!form) return;
 
         form.addEventListener('submit', (event) => {
-            console.log('submit')
             event.preventDefault();
 
             const fData = new FormData(form);
             const formData = Object.fromEntries(fData.entries());
-            console.log(formData);
 
             toggleGameboard();
 
