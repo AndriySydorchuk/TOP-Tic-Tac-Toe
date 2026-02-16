@@ -57,7 +57,8 @@ body {
     width: 50%;
 }
 
-.form-hidden {
+.form-hidden,
+.hidden {
     display: none;
 }
 
