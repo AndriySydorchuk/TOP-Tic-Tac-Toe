@@ -2,11 +2,9 @@ const Game = (function () {
     let player;
     let computer;
 
-    const initPlayer = function (newPlayer) {
-        player = createPlayer(newPlayer.name, newPlayer.sign.toUpperCase(), playerMove);
-
-        const computerSign = player.getSign() === 'X' ? 'O' : 'X';
-        computer = createPlayer('Computer', computerSign, computerMove);
+    const initPlayers = function (userPlayer) {
+        player = createPlayer(userPlayer.name, userPlayer.sign.toUpperCase(), playerMove);
+        computer = createPlayer('Computer', player.getSign() === 'X' ? 'O' : 'X', computerMove);
     };
 
     const getPlayer = function () {
@@ -30,7 +28,7 @@ const Game = (function () {
         let isPlayerTurn;
 
         DOMHandler.setupForm((formData) => {
-            initPlayer(formData);
+            initPlayers(formData);
             isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
             if (!isPlayerTurn) {
                 computer.move(computer.getSign());
