@@ -71,10 +71,11 @@ const Game = (function () {
 
     const checkWin = function () {
         let winner;
+        const winCombinations = Gameboard.getWinCombs();
 
-        for (let i = 0; i < Gameboard.winCombinations.length; i++) {
+        for (let i = 0; i < winCombinations.length; i++) {
             //get combination
-            const winCondition = Gameboard.winCombinations[i];
+            const winCondition = winCombinations[i];
 
             //get cells
             const [cell1Idx, cell2Idx, cell3Idx] = winCondition;
@@ -128,12 +129,13 @@ const Gameboard = (function () {
         [2, 4, 6],
     ];
 
-    const isEmptyCell = function (index) {
-        if (board[index] === '') {
-            return true;
-        }
-        return false;
-    };
+    const getBoard = function () {
+        return board;
+    }
+
+    const getWinCombs = function () {
+        return winCombinations;
+    }
 
     const setCell = function (index, sign) {
         if (isEmptyCell(index)) {
@@ -145,19 +147,22 @@ const Gameboard = (function () {
         return board[index];
     };
 
+    const isEmptyCell = function (index) {
+        if (board[index] === '') {
+            return true;
+        }
+        return false;
+    };
+
     const isFull = function () {
         return board.flat().every(cell => cell !== '');
     };
-
-    const getBoard = function () {
-        return board;
-    }
 
     const clear = function () {
         board = board.map(cell => cell = '');
     }
 
-    return { isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard, clear }
+    return { getBoard, getWinCombs, setCell, getCell, isEmptyCell, isFull, clear }
 })();
 
 function createPlayer(name, sign, moveFunc) {
