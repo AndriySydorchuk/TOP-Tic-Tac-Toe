@@ -128,27 +128,23 @@ const Gameboard = (function () {
         [2, 4, 6],
     ];
 
-    const display = function () {
-        const line1 = `${board[0]} ${board[1]} ${board[2]}`;
-        const line2 = `${board[3]} ${board[4]} ${board[5]}`;
-        const line3 = `${board[6]} ${board[7]} ${board[8]}`;
-        console.log(line1);
-        console.log(line2);
-        console.log(line3);
-        console.log('--------------------------------------');
-    };
     const isEmptyCell = function (index) {
         if (board[index] === '') {
             return true;
         }
         return false;
     };
+
     const setCell = function (index, sign) {
-        board[index] = sign;
+        if (isEmptyCell(index)) {
+            board[index] = sign;
+        }
     };
+
     const getCell = function (index) {
         return board[index];
     };
+
     const isFull = function () {
         return board.flat().every(cell => cell !== '');
     };
@@ -161,7 +157,7 @@ const Gameboard = (function () {
         board = board.map(cell => cell = '');
     }
 
-    return { display, isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard, clear }
+    return { isEmptyCell, setCell, getCell, winCombinations, isFull, getBoard, clear }
 })();
 
 function createPlayer(name, sign, moveFunc) {
