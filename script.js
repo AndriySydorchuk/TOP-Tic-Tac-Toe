@@ -1,6 +1,8 @@
 const Game = (function () {
     let player;
     let computer;
+    let winner;
+
 
     const initPlayers = function (userPlayer) {
         player = createPlayer(userPlayer.name, userPlayer.sign.toUpperCase(), playerMove);
@@ -8,27 +10,23 @@ const Game = (function () {
     };
 
     const getPlayer = function () {
-        if (player) {
-            return player;
-        }
+        return player;
     }
 
     const getComputer = function () {
-        if (computer) {
-            return computer;
-        }
+        return computer;
+    }
+
+    const getWinner = function () {
+        return winner;
     }
 
     const play = function () {
-        let result = {
-            win: false,
-            winner: ''
-        }
-
         let isPlayerTurn;
 
         DOMHandler.setupForm((formData) => {
             initPlayers(formData);
+
             isPlayerTurn = player.getSign().toLowerCase() === 'x' ? true : false;
             if (!isPlayerTurn) {
                 computer.move(computer.getSign());
@@ -41,23 +39,23 @@ const Game = (function () {
             let initialCellText = selectedCell.innerText;
 
             if (isPlayerTurn) {
-                //Player turn
-                player.move(player.getSign(), selectedCell.id);
-                if (initialCellText === Gameboard.getCell(selectedCell.id)) return;
+                player.move(player.getSign(), selectedCell.id);//todo
+                const moveNotSetted = initialCellText === Gameboard.getCell(selectedCell.id);
+                if (moveNotSetted) return;
 
                 DOMHandler.updateBoard();
 
-                result = checkWin();
+                winner = checkWin();
 
                 //Computer turn
-                if (!result.win) {
+                if (!winner) {
                     computer.move(computer.getSign());
                     DOMHandler.updateBoard();
-                    result = checkWin();
+                    winner = checkWin();
                 }
             }
 
-            DOMHandler.displayWinner(result);
+            DOMHandler.displayWinner();
         });
 
         DOMHandler.setupRestartBtn(() => {
@@ -72,8 +70,7 @@ const Game = (function () {
     };
 
     const checkWin = function () {
-        let win = false;
-        let winner = '';
+        let winner;
 
         for (let i = 0; i < Gameboard.winCombinations.length; i++) {
             //get combination
@@ -97,24 +94,19 @@ const Game = (function () {
             const val3 = Gameboard.getCell(cell3Idx);
 
             if (val1 === val2 && val2 === val3 && val1 !== '') {
-                win = true;
-                winner = val1;
+                winner = val1 === player.getSign() ? player.getName() : computer.getName();
             }
         }
 
-        if (win) {
-            return { win, winner };
-        };
+        if (winner) return winner;
 
         //tie
-        if (Gameboard.isFull()) {
-            return { win: true, winner: 'tie' };
-        };
+        if (Gameboard.isFull()) return 'tie';
 
-        return { win: false, winner };
+        return undefined;
     };
 
-    return { initPlayer, getPlayer, getComputer, play };
+    return { getPlayer, getComputer, getWinner, play };
 })();
 
 const Gameboard = (function () {
@@ -298,28 +290,25 @@ const DOMHandler = (function () {
         }
     };
 
-    const displayWinner = function (result) {
-        if (result.win) {
-            addWinnerText(result.winner);
+    const displayWinner = function () {
+        if (Game.getWinner()) {
+            addWinnerText();
             addRestartBtns();
 
             toggleCellsActiveness();
         }
     }
 
-    const addWinnerText = function (winner) {
+    const addWinnerText = function () {
         const container = document.querySelector('.container');
+        const message = document.createElement('p');
 
-        const winnerText = document.createElement('p');
-        if (winner === 'tie') {
-            winnerText.textContent = 'Tie!';
-        } else {
-            const winnerPlayer = winner === Game.getPlayer().getSign() ? Game.getPlayer() : Game.getComputer();
-            winnerText.textContent = `${winnerPlayer.getName()} wins!`;
-        }
-        winnerText.classList.add('winner-text');
+        const winner = Game.getWinner();
 
-        container.appendChild(winnerText);
+        message.textContent = winner === 'tie' ? 'Tie!' : `${winner} wins!`;
+        message.classList.add('winner-text');
+
+        container.appendChild(message);
     }
 
     const addRestartBtns = function () {
