@@ -274,12 +274,12 @@ const DOMHandler = (function () {
         const isCreatePlayer = board.style.display === '';
 
         if (isCreatePlayer) {
-            formTitle.classList.add('form-hidden');
-            form.classList.add('form-hidden');
+            formTitle.classList.add('hidden');
+            form.classList.add('hidden');
             board.style.display = 'grid';
         } else {
-            formTitle.classList.remove('form-hidden');
-            form.classList.remove('form-hidden');
+            formTitle.classList.remove('hidden');
+            form.classList.remove('hidden');
             board.style.display = '';
         }
     };
@@ -348,9 +348,6 @@ const DOMHandler = (function () {
             toggleCellsActiveness()
 
             if (typeof onSuccess === 'function') {
-
-                //if not player turn
-                //computer turn
                 return onSuccess();
             }
         })
@@ -371,5 +368,3 @@ const DOMHandler = (function () {
 })();
 
 Game.play();
-
-//TODO handle scenario when player selects O as a sign
